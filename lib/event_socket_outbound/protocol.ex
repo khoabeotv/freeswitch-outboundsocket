@@ -28,6 +28,10 @@ defmodule EventSocketOutbound.Protocol do
     GenServer.call(pid, {{:filter}, {args}})
   end
 
+  def sendevent(pid, args) do
+    GenServer.call(pid, {{:sendevent}, {args}})
+  end
+
   @doc """
   Not to close the socket connect when a channel hangs up.
   For further details, refer to  FreeSWITCH [docs](https://freeswitch.org/confluence/display/FREESWITCH/mod_event_socket#mod_event_socket-linger).
@@ -188,6 +192,11 @@ defmodule EventSocketOutbound.Protocol do
   def handle_call({{:filter}, {args}}, from, %{cmds: cmds} = state) do
     sendcmd(state, "filter " <> args)
     {:noreply, %{state | cmds: cmds ++ [{from, "filter"}]}}
+  end
+
+  def handle_call({{:sendevent}, {args}}, from, %{cmds: cmds} = state) do
+    sendcmd(state, "sendevent " <> args)
+    {:noreply, %{state | cmds: cmds ++ [{from, "sendevent"}]}}
   end
 
   # def handle_call({{:auth}, {args}}, from, %{cmds: cmds} = state) do
